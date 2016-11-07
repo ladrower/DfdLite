@@ -112,9 +112,22 @@
              * @returns {Promise}
              */
             done: function (cb) {
-                dfd._onResolvedCbs.push(cb);
+                var newDfd = new DfdLite();
+
+                dfd._onResolvedCbs.push(function (data) {
+                    var result = cb(data);
+                    if (isPromise(result)) {
+                        result.done(newDfd.resolve.bind(newDfd));
+                        result.fail(newDfd.reject.bind(newDfd));
+                    } else if (result === void(0)) {
+                        newDfd.reject(result);
+                    } else {
+                        newDfd.resolve(result)
+                    }
+                });
                 dfd._state === DfdLite.STATE.RESOLVED && dfd._onResolved();
-                return this;
+
+                return newDfd.promise();
             },
 
             /**
