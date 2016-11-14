@@ -119,8 +119,6 @@
                     if (isPromise(result)) {
                         result.done(newDfd.resolve.bind(newDfd));
                         result.fail(newDfd.reject.bind(newDfd));
-                    } else if (result === void(0)) {
-                        newDfd.reject(result);
                     } else {
                         newDfd.resolve(result)
                     }
